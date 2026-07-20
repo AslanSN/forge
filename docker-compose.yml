@@ -1,0 +1,24 @@
+# forge · local infrastructure.
+#   make up     → start this
+#   make psql   → connect with psql
+#   make down   → stop (keeps data)   |   make reset → wipe + fresh + migrate
+services:
+  db:
+    image: postgres:17
+    container_name: forge-db
+    environment:
+      POSTGRES_USER: forge
+      POSTGRES_PASSWORD: forge
+      POSTGRES_DB: forge
+    ports:
+      - "5432:5432"
+    volumes:
+      - forge-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forge -d forge"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  forge-db-data:

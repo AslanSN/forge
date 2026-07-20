@@ -1,0 +1,15 @@
+# .NET
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+TestResults/
+.vs/
+.idea/
+
+# OS
+.DS_Store
+
+# Local env overrides
+*.local.env
