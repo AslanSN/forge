@@ -23,3 +23,17 @@ public static class AccountRules
         return (name, null);
     }
 }
+
+/// <summary>
+/// paso-01 · money rules. YOUR TURN — implement NormalizeAmount so MoneyRulesTests pass.
+/// See docs/paso-01-money.md. PURE (no I/O) so it is unit-testable without a database.
+/// </summary>
+public static class MoneyRules
+{
+    /// <summary>
+    /// Validate a monetary amount. Return the amount, or an error message.
+    /// Rules: must be &gt; 0, and at most 2 decimal places.
+    /// </summary>
+    public static (decimal Amount, string? Error) NormalizeAmount(decimal raw) =>
+        throw new NotImplementedException("paso-01: implement MoneyRules.NormalizeAmount (delete this throw).");
+}

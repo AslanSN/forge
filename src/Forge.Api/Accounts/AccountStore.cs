@@ -47,6 +47,18 @@ public sealed class AccountStore(string connectionString)
         return await reader.ReadAsync(ct) ? Map(reader) : null;
     }
 
+    // ── paso-01 · money · YOUR TURN ──────────────────────────────────────────
+    // Implement deposit and withdraw (see docs/paso-01-money.md).
+    // Keep money in `decimal` end to end (never float/double); validate with
+    // MoneyRules.NormalizeAmount. Withdraw must reject overdrawing.
+    // Do the naive read-modify-write in C# for now — paso-02 breaks it under load.
+
+    public Task<(AccountResponse? Account, string? Error)> DepositAsync(Guid id, decimal amount, CancellationToken ct = default) =>
+        throw new NotImplementedException("paso-01: implement deposit");
+
+    public Task<(AccountResponse? Account, string? Error)> WithdrawAsync(Guid id, decimal amount, CancellationToken ct = default) =>
+        throw new NotImplementedException("paso-01: implement withdraw (reject overdraft)");
+
     private static AccountResponse Map(NpgsqlDataReader r) =>
         new(r.GetGuid(0), r.GetString(1), r.GetDecimal(2));
 }
