@@ -170,5 +170,13 @@ relational."* A gap becomes a trajectory.
 
 ## Immediate next actions
 
-- [ ] Commit paso-00b — finished, sitting uncommitted in the working tree since 22 July.
-- [ ] Start paso-04b.
+Two pasos are already open and half-built. The priority order above starts once they are closed —
+carrying a permanently red suite into a new paso is how a suite stops being read at all.
+
+- [x] **Commit paso-00b** — done (`709549a`). The write-up and the executable spec are in.
+- [ ] **Finish paso-01** — `MoneyRules.NormalizeAmount` is still a `NotImplementedException`; four
+      tests are red. The smallest of the three, and it puts the suite back to green.
+- [ ] **Finish paso-00b** — no `Dockerfile`, no `.dockerignore`, no `api` service in the compose
+      file yet, so `make verify-image` fails at its first assertion. Needs only Docker: no local
+      .NET SDK, which makes it the one that can be done from anywhere.
+- [ ] **Start paso-04b.**
