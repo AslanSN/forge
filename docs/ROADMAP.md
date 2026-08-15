@@ -10,12 +10,17 @@ The method is **do it wrong first**: each paso ships the tempting-but-wrong vers
 | 02 | Concurrency | read-balance-then-write → double-spend | transaction + `SELECT FOR UPDATE`; isolation levels | — |
 | 03 | Idempotency | check-then-insert race → duplicate rows | unique constraint + idempotency key → idempotent 409 | #14 |
 | 04 | Indexing | sequential scan on a hot query | `EXPLAIN ANALYZE` → the right index; connection pooling | #15 |
+| 04b ⚖️ | Choosing the store | force every shape into the relational model (or flee to a document store wholesale) | where relational saves you vs. taxes you; what a document store buys and charges; one genuinely document-shaped entity, and the write-up of why | — |
 | 05 | ORM | EF Core hides the transaction/lock | map the same ops, log the generated SQL, keep control | #07 |
 | 06 | Outbox | publish-before-commit / dual-write | transactional outbox (atomic write + enqueue) | #04 |
+| 06b ⚖️ | Queues as buffers | call the downstream service inline; treat a queue as "async Kafka" | the queue as a *shock absorber*: work queue vs. fan-out, at-least-once → idempotent consumers, visibility timeout, retry with backoff, DLQ, backpressure, priority lanes — and why this is a different question from streaming | — |
 | 07 | Kafka | fire-and-forget, wrong partition key | keys, offsets, at-least-once, idempotent consumers, DLQ | #13 |
 | 08 | Eventual consistency | read the read-model right after a write | projections + reconciling read-model lag | — |
 | 09 | Ops | no health checks, abrupt shutdown | readiness/liveness probes, metrics, graceful shutdown | #11 |
 | 10 | Interview layer | — | each paso ↔ the mid/senior question it answers | — |
+| 11 ⚖️ | The compute seam | run the heavy, CPU-bound job inside a serverless function and hit the hard timeout | serverless function vs. container vs. always-on worker: cold starts, execution ceilings, memory, concurrency per instance — and the criterion for *when not* to go serverless | — |
+| 11b | The cloud seam | "it runs on my machine with Compose"; learn one provider's console instead of the primitives | stand the seam up on **one** managed cloud, then write the primitive-mapping table across GCP / AWS / Azure — managed identity instead of secrets, connection limits against a pooled database, and what the cloud silently changes about paso 02–07 | — |
+| 12 ⭐⚖️ | The agent seam | let the agent call the service directly and hope | an agent chooses the route, but the choice is recorded idempotently, published through the outbox, and a downstream failure cannot corrupt state — *architecture for AI systems* | — |
 
 ## Gaps this is built to close
 
@@ -24,6 +29,38 @@ Self-assessed, honestly:
 - **Operating a database directly** — raw SQL, `psql`, transactions, isolation, locking, index maintenance, connection pooling. (paso 00–05)
 - **Docker beyond the basics** — *authoring* images, not just consuming them: stage boundaries, layer cache, the runtime user, and wiring services together. (paso 00b, then 07, 09)
 - **Message brokers / Kafka** — from zero to producers, consumers, partitions, and delivery semantics. (paso 07)
+- **Storage-choice judgment** — relational vs. document, argued rather than assumed. (paso 04b)
+- **Queueing as a load-shaping tool**, distinct from streaming. (paso 06b)
+- **Compute-model judgment** — serverless function vs. container vs. worker, and the cost of
+  getting it wrong for long or CPU-bound work. (paso 11)
+- **Running the thing on a managed cloud**, not just on Compose — and holding the primitives
+  provider-independently rather than learning one console. (paso 11b)
+- **Putting an agent's decision on top of all of it** without letting a non-deterministic choice
+  corrupt state. (paso 12)
+
+The order I actually walk these — and the two pasos I skip because the evidence already exists —
+is in [PLAN.md](PLAN.md).
+
+## ⚖️ Pasos that need a second opinion
+
+Most pasos here have a **verifiable** answer: a test fails, you fix it, the test passes, and the
+machine tells you whether you were right. A few do not. Choosing a store, choosing a compute
+model, shaping a queue and putting an agent's decision on top of the whole thing are **judgment**
+— and judgment is where being confidently wrong is invisible, because nothing goes red.
+
+Those pasos are marked **⚖️**. The rule for them:
+
+1. **Decide first, alone.** Write down the decision, the reasons, and — the line most people skip —
+   *what would have to be true for the opposite decision to be right*.
+2. **Only then, get it read** by someone who runs systems like this at a scale you haven't.
+   Not "teach me this", but *"here's what I decided and why — where am I wrong?"*
+
+The order matters. Ask first and you inherit an answer you can recite but not defend under a
+follow-up question, which is worse than not knowing: it fails at exactly the moment it counts.
+Decide first and the same conversation returns their criterion applied to *your* reasoning.
+
+A ⚖️ paso is not finished when the code runs. It is finished when someone qualified has read the
+write-up and disagreed with at least one thing in it.
 
 ## Conventions
 
