@@ -11,7 +11,9 @@ services:
       POSTGRES_PASSWORD: forge
       POSTGRES_DB: forge
     ports:
-      - "5432:5432"
+      # Host port is overridable (see .env) because 5432 is often already taken
+      # by another project's stack. Inside the compose network it is always 5432.
+      - "${FORGE_DB_PORT:-5432}:5432"
     volumes:
       - forge-db-data:/var/lib/postgresql/data
     healthcheck:

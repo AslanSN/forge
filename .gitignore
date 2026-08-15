@@ -13,3 +13,4 @@ TestResults/
 
 # Local env overrides
 *.local.env
+.env

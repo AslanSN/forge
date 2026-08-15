@@ -17,6 +17,7 @@ The domain is a double-entry ledger / wallet — the classic backend rite of pas
 | paso | Focus | Teaches |
 |------|-------|---------|
 | **00** | The database, by hand (no ORM) | psql, raw parameterized SQL, hand-written migrations, schema design |
+| **00b** | The image, by hand | multi-stage builds, layer cache, non-root containers, compose wiring |
 | 01 | Money, correctly | `numeric` vs `float`, constraints, the double-entry invariant |
 | 02 ⭐ | Transactions, isolation & the double-spend race | `SELECT FOR UPDATE`, isolation levels, concurrency tests |
 | 03 | Idempotency & uniqueness | idempotency keys, unique constraints, safe retries |
@@ -47,6 +48,8 @@ curl localhost:5000/accounts/<id-from-above>
 ```
 
 Tests: `make test`. The unit tests always run; the integration tests **skip cleanly** if Postgres isn't up, so the suite is green either way.
+
+`make verify-image` runs paso-00b's executable spec for the container image — red until you write the Dockerfile, and it needs only Docker (no local .NET SDK).
 
 ## Repository layout
 

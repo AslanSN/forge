@@ -8,4 +8,13 @@
 
 This division is deliberate, and it is itself part of the point: the AI-native way to get stronger at a fundamental is to let the AI carry the *scaffolding* while you keep the *judgment*.
 
+## Attribution, per paso
+
+Blanket credit for a repository is worthless, so the split is recorded step by step.
+
+- **paso-00** is the **worked reference example**: the AI wrote the implementation so there would be one solved paso to read for shape and conventions.
+- **paso-00b onward are inverted.** The AI writes the write-up, the contract, and an executable spec that fails; the *implementation is the human's*, typed by hand. The AI reviews and answers with questions, and does not supply the fix. Where a paso is inverted, its write-up says so.
+
+The honest sentence about this repo is therefore "I designed and directed it, and from paso-00b I implement it by hand against specs I asked for" — not "I hand-built a .NET backend."
+
 Related work by the same author: [gotcha](https://github.com/AslanSN/gotcha) — a catalog of subtly-wrong backend code, with an MCP server and evals. `forge` is its constructive twin: where `gotcha` catalogs the traps, `forge` builds the way out of each one by hand.

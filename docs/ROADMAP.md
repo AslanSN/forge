@@ -5,6 +5,7 @@ The method is **do it wrong first**: each paso ships the tempting-but-wrong vers
 | paso | Focus | The wrong-first | The fix / lesson | gotcha |
 |------|-------|-----------------|------------------|--------|
 | 00 | The database, by hand | string-interpolated SQL; ad-hoc DDL | parameterized queries; versioned migrations | — |
+| 00b | The image, by hand | single-stage SDK image, root user, `COPY . .` before restore | multi-stage build, non-root, cache-ordered layers, compose wiring | — |
 | 01 | Money | `float`/`double` balance → drift | `numeric(18,2)`, CHECKs, Σ(entries)=0 | #06 |
 | 02 | Concurrency | read-balance-then-write → double-spend | transaction + `SELECT FOR UPDATE`; isolation levels | — |
 | 03 | Idempotency | check-then-insert race → duplicate rows | unique constraint + idempotency key → idempotent 409 | #14 |
@@ -21,7 +22,7 @@ The method is **do it wrong first**: each paso ships the tempting-but-wrong vers
 Self-assessed, honestly:
 
 - **Operating a database directly** — raw SQL, `psql`, transactions, isolation, locking, index maintenance, connection pooling. (paso 00–05)
-- **Docker beyond the basics** — standing up and wiring real infrastructure. (paso 00, 07, 09)
+- **Docker beyond the basics** — *authoring* images, not just consuming them: stage boundaries, layer cache, the runtime user, and wiring services together. (paso 00b, then 07, 09)
 - **Message brokers / Kafka** — from zero to producers, consumers, partitions, and delivery semantics. (paso 07)
 
 ## Conventions
@@ -29,3 +30,4 @@ Self-assessed, honestly:
 - One migration file per change under `db/migrations/`, numbered, idempotent, applied by `scripts/migrate.sh` — never auto-applied on startup.
 - Every paso has: a `docs/paso-NN-*.md` write-up (goal · do-it-wrong-first · the fix · what to be able to explain), working code, tests, and a `paso-NN` git tag.
 - Tests: pure unit tests never need Docker; integration tests skip cleanly when the DB is down.
+- **Inverted pasos** ship the spec *before* the implementation: the write-up states the contract, an executable spec fails until you satisfy it, and the answers are questions. paso-00b is the first (`make verify-image`). Its spec is bash rather than xUnit because it asserts properties of an *image*, and must run without a local .NET SDK.
