@@ -34,7 +34,7 @@ run: ## run the API (needs: make up && make migrate)
 	@if [ -f .env ]; then set -a; . ./.env; set +a; fi; dotnet run --project src/Forge.Api
 
 test: ## run tests (integration tests skip if the db is down)
-	dotnet test
+	@if [ -f .env ]; then set -a; . ./.env; set +a; fi; dotnet test
 
 image: ## build the container image (paso-00b; needs your Dockerfile)
 	docker build -t forge-api:paso-00b .

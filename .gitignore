@@ -14,3 +14,6 @@ TestResults/
 # Local env overrides
 *.local.env
 .env
+
+# Personal cheat-sheets
+docs/*cheatsheet*
