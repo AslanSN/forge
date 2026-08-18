@@ -4,7 +4,7 @@ namespace Forge.Api.Accounts;
 
 /// <summary>
 /// paso-00 · the database, by hand. No ORM — raw SQL over Npgsql, ALWAYS
-/// parameterized (never string-interpolated; see docs/paso-00-la-bd-a-pelo.md).
+/// parameterized (never string-interpolated; see docs/paso-00-the-database-by-hand.md).
 ///
 /// NOTE: <c>balance</c> is a mutable column here. That is deliberately naive.
 /// paso-02 (the double-spend race) will break it and force an append-only

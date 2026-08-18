@@ -8,7 +8,7 @@ namespace Forge.Tests;
 /// Run them with:  make up && make migrate && make test
 ///
 /// If the DB is unreachable they SKIP (not fail), so <c>dotnet test</c> stays
-/// green with Docker down. A later paso upgrades these to hermetic Testcontainers.
+/// green with Docker down. A later step upgrades these to hermetic Testcontainers.
 /// </summary>
 public class AccountStoreTests
 {

@@ -32,5 +32,5 @@ app.MapGet("/accounts/{id:guid}", async (Guid id, AccountStore store, Cancellati
 
 app.Run();
 
-// Exposed so later pasos can drive the app with WebApplicationFactory in tests.
+// Exposed so later steps can drive the app with WebApplicationFactory in tests.
 public partial class Program;
