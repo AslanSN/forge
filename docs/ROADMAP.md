@@ -1,8 +1,10 @@
 # Roadmap
 
-The method is **do it wrong first**: each paso ships the tempting-but-wrong version, reproduces the failure with a test, then fixes it. Each maps to a real backend fundamental and, where relevant, to an entry in the [gotcha](https://github.com/AslanSN/gotcha) catalog.
+The method is **do it wrong first**: each step ships the tempting-but-wrong version, reproduces the failure with a test, then fixes it. Each maps to a real backend fundamental and, where relevant, to an entry in the [gotcha](https://github.com/AslanSN/gotcha) catalog.
 
-| paso | Focus | The wrong-first | The fix / lesson | gotcha |
+Each step is identified as `paso-NN` — the write-up filename, and the git tag.
+
+| step | Focus | The wrong-first | The fix / lesson | gotcha |
 |------|-------|-----------------|------------------|--------|
 | 00 | The database, by hand | string-interpolated SQL; ad-hoc DDL | parameterized queries; versioned migrations | — |
 | 00b | The image, by hand | single-stage SDK image, root user, `COPY . .` before restore | multi-stage build, non-root, cache-ordered layers, compose wiring | — |
@@ -17,38 +19,38 @@ The method is **do it wrong first**: each paso ships the tempting-but-wrong vers
 | 07 | Kafka | fire-and-forget, wrong partition key | keys, offsets, at-least-once, idempotent consumers, DLQ | #13 |
 | 08 | Eventual consistency | read the read-model right after a write | projections + reconciling read-model lag | — |
 | 09 | Ops | no health checks, abrupt shutdown | readiness/liveness probes, metrics, graceful shutdown | #11 |
-| 10 | Interview layer | — | each paso ↔ the mid/senior question it answers | — |
+| 10 | Interview layer | — | each step ↔ the mid/senior question it answers | — |
 | 11 ⚖️ | The compute seam | run the heavy, CPU-bound job inside a serverless function and hit the hard timeout | serverless function vs. container vs. always-on worker: cold starts, execution ceilings, memory, concurrency per instance — and the criterion for *when not* to go serverless | — |
-| 11b | The cloud seam | "it runs on my machine with Compose"; learn one provider's console instead of the primitives | stand the seam up on **one** managed cloud, then write the primitive-mapping table across GCP / AWS / Azure — managed identity instead of secrets, connection limits against a pooled database, and what the cloud silently changes about paso 02–07 | — |
+| 11b | The cloud seam | "it runs on my machine with Compose"; learn one provider's console instead of the primitives | stand the seam up on **one** managed cloud, then write the primitive-mapping table across GCP / AWS / Azure — managed identity instead of secrets, connection limits against a pooled database, and what the cloud silently changes about steps 02–07 | — |
 | 12 ⭐⚖️ | The agent seam | let the agent call the service directly and hope | an agent chooses the route, but the choice is recorded idempotently, published through the outbox, and a downstream failure cannot corrupt state — *architecture for AI systems* | — |
 
 ## Gaps this is built to close
 
 Self-assessed, honestly:
 
-- **Operating a database directly** — raw SQL, `psql`, transactions, isolation, locking, index maintenance, connection pooling. (paso 00–05)
-- **Docker beyond the basics** — *authoring* images, not just consuming them: stage boundaries, layer cache, the runtime user, and wiring services together. (paso 00b, then 07, 09)
-- **Message brokers / Kafka** — from zero to producers, consumers, partitions, and delivery semantics. (paso 07)
-- **Storage-choice judgment** — relational vs. document, argued rather than assumed. (paso 04b)
-- **Queueing as a load-shaping tool**, distinct from streaming. (paso 06b)
+- **Operating a database directly** — raw SQL, `psql`, transactions, isolation, locking, index maintenance, connection pooling. (steps 00–05)
+- **Docker beyond the basics** — *authoring* images, not just consuming them: stage boundaries, layer cache, the runtime user, and wiring services together. (step 00b, then 07, 09)
+- **Message brokers / Kafka** — from zero to producers, consumers, partitions, and delivery semantics. (step 07)
+- **Storage-choice judgment** — relational vs. document, argued rather than assumed. (step 04b)
+- **Queueing as a load-shaping tool**, distinct from streaming. (step 06b)
 - **Compute-model judgment** — serverless function vs. container vs. worker, and the cost of
-  getting it wrong for long or CPU-bound work. (paso 11)
+  getting it wrong for long or CPU-bound work. (step 11)
 - **Running the thing on a managed cloud**, not just on Compose — and holding the primitives
-  provider-independently rather than learning one console. (paso 11b)
+  provider-independently rather than learning one console. (step 11b)
 - **Putting an agent's decision on top of all of it** without letting a non-deterministic choice
-  corrupt state. (paso 12)
+  corrupt state. (step 12)
 
-The order I actually walk these — and the two pasos I skip because the evidence already exists —
+The order I actually walk these — and the two steps I skip because the evidence already exists —
 is in [PLAN.md](PLAN.md).
 
-## ⚖️ Pasos that need a second opinion
+## ⚖️ Steps that need a second opinion
 
-Most pasos here have a **verifiable** answer: a test fails, you fix it, the test passes, and the
+Most steps here have a **verifiable** answer: a test fails, you fix it, the test passes, and the
 machine tells you whether you were right. A few do not. Choosing a store, choosing a compute
 model, shaping a queue and putting an agent's decision on top of the whole thing are **judgment**
 — and judgment is where being confidently wrong is invisible, because nothing goes red.
 
-Those pasos are marked **⚖️**. The rule for them:
+Those steps are marked **⚖️**. The rule for them:
 
 1. **Decide first, alone.** Write down the decision, the reasons, and — the line most people skip —
    *what would have to be true for the opposite decision to be right*.
@@ -59,12 +61,12 @@ The order matters. Ask first and you inherit an answer you can recite but not de
 follow-up question, which is worse than not knowing: it fails at exactly the moment it counts.
 Decide first and the same conversation returns their criterion applied to *your* reasoning.
 
-A ⚖️ paso is not finished when the code runs. It is finished when someone qualified has read the
+A ⚖️ step is not finished when the code runs. It is finished when someone qualified has read the
 write-up and disagreed with at least one thing in it.
 
 ## Conventions
 
 - One migration file per change under `db/migrations/`, numbered, idempotent, applied by `scripts/migrate.sh` — never auto-applied on startup.
-- Every paso has: a `docs/paso-NN-*.md` write-up (goal · do-it-wrong-first · the fix · what to be able to explain), working code, tests, and a `paso-NN` git tag.
+- Every step has: a `docs/paso-NN-*.md` write-up (goal · do-it-wrong-first · the fix · what to be able to explain), working code, tests, and a `paso-NN` git tag.
 - Tests: pure unit tests never need Docker; integration tests skip cleanly when the DB is down.
-- **Inverted pasos** ship the spec *before* the implementation: the write-up states the contract, an executable spec fails until you satisfy it, and the answers are questions. paso-00b is the first (`make verify-image`). Its spec is bash rather than xUnit because it asserts properties of an *image*, and must run without a local .NET SDK.
+- **Inverted steps** ship the spec *before* the implementation: the write-up states the contract, an executable spec fails until you satisfy it, and the answers are questions. `paso-00b` is the first (`make verify-image`). Its spec is bash rather than xUnit because it asserts properties of an *image*, and must run without a local .NET SDK.

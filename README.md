@@ -14,7 +14,7 @@ The domain is a double-entry ledger / wallet — the classic backend rite of pas
 
 ## Roadmap
 
-| paso | Focus | Teaches |
+| step | Focus | Teaches |
 |------|-------|---------|
 | **00** | The database, by hand (no ORM) | psql, raw parameterized SQL, hand-written migrations, schema design |
 | **00b** | The image, by hand | multi-stage builds, layer cache, non-root containers, compose wiring |
@@ -27,9 +27,9 @@ The domain is a double-entry ledger / wallet — the classic backend rite of pas
 | 07 | Kafka | producers/consumers, partitions, at-least-once, DLQ |
 | 08 | Eventual consistency & read models | projections, read-model lag |
 | 09 | Observability & ops | health/readiness/liveness, metrics, graceful shutdown |
-| 10 | The interview layer | each paso mapped to a mid/senior interview question |
+| 10 | The interview layer | each step mapped to a mid/senior interview question |
 
-Full detail in [docs/ROADMAP.md](docs/ROADMAP.md). Each paso ships a `docs/paso-NN-*.md` write-up, working code, tests, and a git tag `paso-NN` — so you can `git checkout paso-02` to see exactly that state.
+Full detail in [docs/ROADMAP.md](docs/ROADMAP.md). Each step ships a `docs/paso-NN-*.md` write-up, working code, tests, and a git tag `paso-NN` — so you can `git checkout paso-02` to see exactly that state.
 
 ## Stack
 
@@ -57,7 +57,7 @@ Tests: `make test`. The unit tests always run; the integration tests **skip clea
 db/migrations/      hand-written SQL migrations (applied by scripts/migrate.sh)
 src/Forge.Api/      the service (raw Npgsql at paso-00; EF arrives at paso-05)
 tests/Forge.Tests/  unit (no Docker) + integration (skips if the DB is down)
-docs/               the paso write-ups + roadmap
+docs/               the step write-ups + roadmap
 ```
 
 ## Colophon

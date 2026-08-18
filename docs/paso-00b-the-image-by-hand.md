@@ -2,9 +2,9 @@
 
 **Goal:** package the service as a container image *you wrote*, and run it next to Postgres on a compose network — so both sides of the app are infrastructure you can explain.
 
-**Gap it closes:** "Docker beyond the basics." paso-00 *consumed* a container (`make up` starts someone else's Postgres image). Running `docker compose up` teaches you Docker the way an ORM teaches you SQL: it works, and you learn nothing about the layer underneath. This paso makes you the **author** of the image, not its consumer.
+**Gap it closes:** "Docker beyond the basics." paso-00 *consumed* a container (`make up` starts someone else's Postgres image). Running `docker compose up` teaches you Docker the way an ORM teaches you SQL: it works, and you learn nothing about the layer underneath. This step makes you the **author** of the image, not its consumer.
 
-> **This paso is inverted** (see [COLOPHON.md](../COLOPHON.md)). The spec is written for you; the `Dockerfile`, the `.dockerignore` and the compose `api` service are **yours to type**. `scripts/verify-image.sh` is the failing test — it asserts properties and answers every failure with a *question*, never with the fix.
+> **This step is inverted** (see [COLOPHON.md](../COLOPHON.md)). The spec is written for you; the `Dockerfile`, the `.dockerignore` and the compose `api` service are **yours to type**. `scripts/verify-image.sh` is the failing test — it asserts properties and answers every failure with a *question*, never with the fix.
 
 ## Do it wrong first
 
@@ -64,7 +64,7 @@ docker compose logs -f api
 
 Base images you'll want to know about (all three exist for .NET 10): `mcr.microsoft.com/dotnet/sdk:10.0` to build, `mcr.microsoft.com/dotnet/aspnet:10.0` to run, and `mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled` — no shell, no package manager, ~100 MB — when you want to see how small correct can get. Chiseled changes how you create a user; that difference is the lesson, not an obstacle.
 
-**No local .NET SDK required.** The compile happens inside the build stage, which is why this is the one paso you can finish on a machine with only Docker installed.
+**No local .NET SDK required.** The compile happens inside the build stage, which is why this is the one step you can finish on a machine with only Docker installed.
 
 ## What to be able to explain afterwards
 
@@ -77,4 +77,4 @@ Base images you'll want to know about (all three exist for .NET 10): `mcr.micros
 
 ## The interview question this answers
 
-*"Walk me through how you'd containerize this service for production."* A candidate who has consumed Docker says "I'd write a Dockerfile and run docker build." A candidate who has authored one talks about stage boundaries, cache ordering, the runtime user, and where the config comes from — and can say why each choice is the way it is. That gap is this paso.
+*"Walk me through how you'd containerize this service for production."* A candidate who has consumed Docker says "I'd write a Dockerfile and run docker build." A candidate who has authored one talks about stage boundaries, cache ordering, the runtime user, and where the config comes from — and can say why each choice is the way it is. That gap is this step.

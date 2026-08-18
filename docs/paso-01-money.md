@@ -2,7 +2,7 @@
 
 **Goal:** money that never drifts, and a balance protected against overdraft.
 
-**Your turn.** This paso is an *exercise*: the tests are written and **red**; you make them green. I don't hand you the implementation — the reps are the point.
+**Your turn.** This step is an *exercise*: the tests are written and **red**; you make them green. I don't hand you the implementation — the reps are the point.
 
 ## Do it wrong first — and see it
 

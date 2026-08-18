@@ -1,6 +1,6 @@
 # Working plan — August 2026
 
-This is the *personal* execution plan for `forge`: which pasos to build first, which to skip,
+This is the *personal* execution plan for `forge`: which steps to build first, which to skip,
 and how much time this is allowed to take. [ROADMAP.md](ROADMAP.md) is the curriculum;
 this file is the order I actually walk it, and why.
 
@@ -50,19 +50,19 @@ question 1.
 
 ## The principle that sets the order
 
-**Judgment pasos pay out in hours. Construction pasos pay out in weeks.**
+**Judgment steps pay out in hours. Construction steps pay out in weeks.**
 
 Choosing a store, choosing a compute model and knowing which queue semantics apply are things I
 can hold and defend after a few hours of deliberate work with one small piece of code to anchor
 them. Kafka, the cloud seam and the projections are builds. In an interview both get asked, but
-only the first kind can be *closed* on a short horizon — so the judgment pasos go first, even
+only the first kind can be *closed* on a short horizon — so the judgment steps go first, even
 though they are less satisfying to build.
 
 ## Priority order
 
-Pasos marked **⚖️** are the judgment ones — they do not get to count as done on a green test
+Steps marked **⚖️** are the judgment ones — they do not get to count as done on a green test
 alone, they need a second opinion first. The convention, and why the order of *decide → then ask*
-is not optional, is in [ROADMAP.md](ROADMAP.md#️-pasos-that-need-a-second-opinion). Of the four,
+is not optional, is in [ROADMAP.md](ROADMAP.md#️-steps-that-need-a-second-opinion). Of the four,
 **04b and 11 are the ones to spend a reviewer's time on first**: they are pure criterion, they are
 cheap to review, and they are the two questions I could not answer cold. 06b can wait until there
 is code to point at; 12 is the capstone and gets read last.
@@ -81,7 +81,7 @@ keep moving — `SELECT FOR UPDATE`, isolation levels, a concurrency test that g
 before it passes, then the unique constraint + idempotency key.
 
 **3. paso-06 + paso-06b ⚖️ — outbox, then queues as buffers**
-The single biggest gap. Build the **queue as a buffer** as its own paso, not folded into Kafka:
+The single biggest gap. Build the **queue as a buffer** as its own step, not folded into Kafka:
 work queue vs. fan-out, at-least-once, visibility timeout, retry with backoff, DLQ, backpressure,
 priority lanes. They answer a different question from streaming and the distinction is exactly
 what gets probed.
@@ -100,9 +100,9 @@ run the heavy job in a serverless function and watch it hit the wall.
 
 ### On paso-11b: build on one cloud, learn all three
 
-The interview was on GCP, but tying the paso to one provider makes the knowledge rot the moment
+The interview was on GCP, but tying the step to one provider makes the knowledge rot the moment
 the next posting says AWS. Build the seam **once**, on whichever provider is cheapest and fastest
-to stand up — and write the **primitive mapping table** as part of the paso, because the mapping
+to stand up — and write the **primitive mapping table** as part of the step, because the mapping
 is the part that actually transfers:
 
 | Primitive | GCP | AWS | Azure |
@@ -116,9 +116,9 @@ is the part that actually transfers:
 | Object storage | GCS | S3 | Blob Storage |
 | Workload identity | Workload Identity | IAM roles | Managed Identity |
 
-The paso's real content is provider-independent anyway: managed identity instead of secrets,
+The step's real content is provider-independent anyway: managed identity instead of secrets,
 connection limits against a pooled database, cold starts, and **what the cloud silently changes
-about pasos 02–07**.
+about steps 02–07**.
 
 ### Deliberately skipped
 
@@ -153,7 +153,7 @@ That is the demo. The full paso-12 still lands at the end, once Kafka and the cl
 
 ## Budget
 
-**4–6 h/week. One paso every 2–3 weeks.**
+**4–6 h/week. One step every 2–3 weeks.**
 
 This does not compete with the job search. `forge` is not what lands the next job — the next job
 comes from the axis that already works: product, full-stack, AI-native, judgment. This is for the
@@ -170,8 +170,8 @@ relational."* A gap becomes a trajectory.
 
 ## Immediate next actions
 
-Two pasos are already open and half-built. The priority order above starts once they are closed —
-carrying a permanently red suite into a new paso is how a suite stops being read at all.
+Two steps are already open and half-built. The priority order above starts once they are closed —
+carrying a permanently red suite into a new step is how a suite stops being read at all.
 
 - [x] **Commit paso-00b** — done (`709549a`). The write-up and the executable spec are in.
 - [ ] **Finish paso-01** — `MoneyRules.NormalizeAmount` is still a `NotImplementedException`; four
@@ -179,4 +179,6 @@ carrying a permanently red suite into a new paso is how a suite stops being read
 - [ ] **Finish paso-00b** — no `Dockerfile`, no `.dockerignore`, no `api` service in the compose
       file yet, so `make verify-image` fails at its first assertion. Needs only Docker: no local
       .NET SDK, which makes it the one that can be done from anywhere.
-- [ ] **Start paso-04b.**
+- [ ] **Start paso-04b** — the write-up is in ([paso-04b](paso-04b-choosing-the-store.md)): a decision brief, not a
+      red spec. What's left is mine — migration `002`, the four probes, and the ADR at
+      `docs/paso-04b-decision.md`, written *before* the reviewer sees it.
