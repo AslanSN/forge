@@ -92,7 +92,7 @@ size_mb=$((size / 1024 / 1024))
 if [ "$size" -gt 0 ] && [ "$size" -lt "$MAX_SIZE_BYTES" ]; then
   ok "image size ${size_mb} MB (< $((MAX_SIZE_BYTES / 1024 / 1024)) MB)"
 else
-  no "image size ${size_mb} MB (< $((MAX_SIZE_BYTES / 1024 / 1024)) MB)" "What exactly is taking up those megabytes? 'docker history $IMAGE' answers it layer by layer."
+  no "image size ${size_mb} M B (< $((MAX_SIZE_BYTES / 1024 / 1024)) MB)" "What exactly is taking up those megabytes? 'docker history $IMAGE' answers it layer by layer."
 fi
 
 user=$(docker inspect -f '{{.Config.User}}' "$IMAGE" 2>/dev/null)
