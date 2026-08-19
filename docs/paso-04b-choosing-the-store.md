@@ -8,6 +8,28 @@
 >
 > **It is also inverted** (see [COLOPHON.md](../COLOPHON.md)): the migration, the queries and the decision are yours to type. What follows states the contract and the questions, never the answer.
 
+## Before you start: read, then probe
+
+Every claim this step asks you to make is something the store's own documentation already says precisely. The skill is that the pages exist and that you can quote them back in your own words. Read these before you write the migration — each bullet points at the **primary source** and names what you should carry out of it. Half of what these probes measure is how fast each page's words become *your* reasons.
+
+### PostgreSQL — the store you own
+
+- **JSON Types** — [PostgreSQL docs: 8.14 JSON Types](https://www.postgresql.org/docs/current/datatype-json.html). `json` vs `jsonb`: how each is stored, the design guidance in *8.14.2 Designing JSON Documents* on when to prefer one, and *8.14.4 jsonb Indexing* — `GIN`, `jsonb_ops` vs `jsonb_path_ops`, and what that buys. This is the deep background of the whole step.
+- **JSON Functions and Operators** — [PostgreSQL docs: 9.16 JSON Functions and Operators](https://www.postgresql.org/docs/current/functions-json.html). `->` vs `->>` vs `#>>` (value vs text vs path), containment `@>`, and `jsonb_populate_record`, so you can project a blob into a row shape without a new table.
+- **GIN Indexes** — [PostgreSQL docs: 65.4 GIN Indexes](https://www.postgresql.org/docs/current/gin.html). What a GIN index actually indexes (elements, not whole values) and why that makes containment and `->` lookups something the index can answer.
+- **Indexes on Expressions** — [PostgreSQL docs: 11.7 Indexes on Expressions](https://www.postgresql.org/docs/current/indexes-expressional.html). How to make a lookup fast on a value you don't store as its own column.
+- **Generated Columns** — [PostgreSQL docs: 5.4 Generated Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html). `GENERATED ALWAYS AS (...) STORED`: the safe way to keep a denormalized copy honest.
+- **Constraints** — [PostgreSQL docs: 5.5 Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html). Read the `CHECK` sections: a constraint sees one row, never its neighbors — and that is exactly why Probe A behaves differently per shape.
+- **TOAST** — [PostgreSQL docs: 66.2 TOAST](https://www.postgresql.org/docs/current/storage-toast.html). What physically happens when you `UPDATE` one key inside a large `jsonb` value, and what that implies for which fields deserve to live in the blob.
+- **Size Functions** — [PostgreSQL docs: 9.28 System Administration Functions · Database Object Size Functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-DBSIZE). `pg_column_size`, for measuring what each shape actually occupies.
+- **Reading the probes** — [PostgreSQL docs: 14.1 Using EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html) and the [EXPLAIN command reference](https://www.postgresql.org/docs/current/sql-explain.html). What `EXPLAIN (ANALYZE, BUFFERS)` is reporting, and why the buffers count matters more than the milliseconds.
+
+### MongoDB — the store you're not fleeing to
+
+- **Unique Indexes** — [MongoDB docs: Unique Indexes](https://www.mongodb.com/docs/manual/core/index-unique/). Enforceability lives there too; the question is never "can it?", it's "is it default-and-cheap?".
+- **Transactions** — [MongoDB docs: Transactions](https://www.mongodb.com/docs/manual/core/transactions/). Multi-document ACID exists since 4.0 — do not start Probe A carrying a stale 2013 talking point.
+- **Data Modeling** — [MongoDB docs: Data Modeling](https://www.mongodb.com/docs/manual/data-modeling/). How a document store models things that elsewhere get joined — and what the modeling *costs* the moment you need a sum across them.
+
 ## Do it wrong first — twice
 
 This step has two wrong-firsts, because the mistake is symmetric and most people only recognize the half they don't commit.
@@ -71,7 +93,7 @@ The contract:
 
 4. **Probe C — the schema that moved under you.** A new provider starts sending a field nobody planned for, and rows written before today will never have it. Add it on both sides, then re-run A and B. What did each side make you do: a migration? a backfill? a deploy? a conversation with another team? How long is each shape unavailable, or wrong, while you do it?
 
-Worth having looked up before you start — knowing that these exist is the point; which ones you use is your decision: `jsonb` vs `json`, the `->` / `->>` / `#>>` operators, containment `@>`, GIN with `jsonb_ops` vs `jsonb_path_ops`, expression indexes, `GENERATED ALWAYS AS (...) STORED` columns, `CHECK` over an expression, `jsonb_populate_record`, `pg_column_size`, and what TOAST does to a large value when you update one key inside it.
+Worth having looked up before you start — knowing that these exist is the point; which ones you use is your decision: `jsonb` vs `json`, the `->` / `->>` / `#>>` operators, containment `@>`, GIN with `jsonb_ops` vs `jsonb_path_ops`, expression indexes, `GENERATED ALWAYS AS (...) STORED` columns, `CHECK` over an expression, `jsonb_populate_record`, `pg_column_size`, and what TOAST does to a large value when you update one key inside it. All of them, linked and with what to extract named, are in [Before you start](#before-you-start-read-then-probe) above.
 
 ### Run it
 

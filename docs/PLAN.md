@@ -170,15 +170,21 @@ relational."* A gap becomes a trajectory.
 
 ## Immediate next actions
 
-Two steps are already open and half-built. The priority order above starts once they are closed —
-carrying a permanently red suite into a new step is how a suite stops being read at all.
+**In practice I'm walking this in step-number order (00, 00b, 00c, 01, 02, …), not in the
+priority order above.** That order was built around one thing — front-load the judgment steps
+because they pay out in hours, not weeks — and numeric order defers `paso-04b` behind `01`, `02`
+and `03`. That's a real trade-off, not a mistake: numeric order is easier to keep moving on with a
+small weekly budget, at the cost of the highest-value-per-hour step sitting untouched longer than
+the priority order would leave it. Worth knowing which one I'm actually doing.
 
 - [x] **Commit paso-00b** — done (`709549a`). The write-up and the executable spec are in.
+- [x] **Finish paso-00b** — `Dockerfile`, `.dockerignore` and the compose `api` service are in;
+      `make verify-image` is green (14/14). Only `git tag paso-00b` is left.
+- [ ] **Start paso-00c** — two hats: the write-up is in
+      ([paso-00c](paso-00c-two-hats.md)). Next in numeric order, before `01`. Nothing here is
+      mine to write — pick the exercise's entity, write the contract, then implement it blind.
 - [ ] **Finish paso-01** — `MoneyRules.NormalizeAmount` is still a `NotImplementedException`; four
       tests are red. The smallest of the three, and it puts the suite back to green.
-- [ ] **Finish paso-00b** — no `Dockerfile`, no `.dockerignore`, no `api` service in the compose
-      file yet, so `make verify-image` fails at its first assertion. Needs only Docker: no local
-      .NET SDK, which makes it the one that can be done from anywhere.
 - [ ] **Start paso-04b** — the write-up is in ([paso-04b](paso-04b-choosing-the-store.md)): a decision brief, not a
       red spec. What's left is mine — migration `002`, the four probes, and the ADR at
       `docs/paso-04b-decision.md`, written *before* the reviewer sees it.

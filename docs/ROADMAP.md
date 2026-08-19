@@ -8,6 +8,7 @@ Each step is identified as `paso-NN` — the write-up filename, and the git tag.
 |------|-------|-----------------|------------------|--------|
 | 00 | The database, by hand | string-interpolated SQL; ad-hoc DDL | parameterized queries; versioned migrations | — |
 | 00b | The image, by hand | single-stage SDK image, root user, `COPY . .` before restore | multi-stage build, non-root, cache-ordered layers, compose wiring | — |
+| 00c | Two hats | write the interface already picturing the implementation you're about to type, so the "contract" just narrates code you'd have written anyway | a real wall between the client hat (contract + acceptance tests, zero implementation) and the engineer hat (implementation against the contract alone, no more context) — the same rep paso-12 later asks of an agent | — |
 | 01 | Money | `float`/`double` balance → drift | `numeric(18,2)`, CHECKs, Σ(entries)=0 | #06 |
 | 02 | Concurrency | read-balance-then-write → double-spend | transaction + `SELECT FOR UPDATE`; isolation levels | — |
 | 03 | Idempotency | check-then-insert race → duplicate rows | unique constraint + idempotency key → idempotent 409 | #14 |
@@ -23,6 +24,16 @@ Each step is identified as `paso-NN` — the write-up filename, and the git tag.
 | 11 ⚖️ | The compute seam | run the heavy, CPU-bound job inside a serverless function and hit the hard timeout | serverless function vs. container vs. always-on worker: cold starts, execution ceilings, memory, concurrency per instance — and the criterion for *when not* to go serverless | — |
 | 11b | The cloud seam | "it runs on my machine with Compose"; learn one provider's console instead of the primitives | stand the seam up on **one** managed cloud, then write the primitive-mapping table across GCP / AWS / Azure — managed identity instead of secrets, connection limits against a pooled database, and what the cloud silently changes about steps 02–07 | — |
 | 12 ⭐⚖️ | The agent seam | let the agent call the service directly and hope | an agent chooses the route, but the choice is recorded idempotently, published through the outbox, and a downstream failure cannot corrupt state — *architecture for AI systems* | — |
+
+**A note on paso-00c:** every gap below comes from the systems-architecture interview in
+[PLAN.md](PLAN.md) — a fixed list, one question per row. `paso-00c` doesn't answer one of those
+questions; it hardens the method the other steps already run on. From `paso-00b` onward, forge
+*is* a client/engineer split — the AI writes the contract, you implement it blind to nothing more
+than what the contract states. `paso-00c` is the one step where you write both halves yourself,
+in sequence, with a real wall in between: the rep of *authoring* a contract someone else has to
+implement without your help is different from the rep of *receiving* one, and `paso-12` will
+eventually ask an agent to work from exactly that kind of contract with no more context than you
+give it.
 
 ## Gaps this is built to close
 
@@ -69,4 +80,4 @@ write-up and disagreed with at least one thing in it.
 - One migration file per change under `db/migrations/`, numbered, idempotent, applied by `scripts/migrate.sh` — never auto-applied on startup.
 - Every step has: a `docs/paso-NN-*.md` write-up (goal · do-it-wrong-first · the fix · what to be able to explain), working code, tests, and a `paso-NN` git tag.
 - Tests: pure unit tests never need Docker; integration tests skip cleanly when the DB is down.
-- **Inverted steps** ship the spec *before* the implementation: the write-up states the contract, an executable spec fails until you satisfy it, and the answers are questions. `paso-00b` is the first (`make verify-image`). Its spec is bash rather than xUnit because it asserts properties of an *image*, and must run without a local .NET SDK.
+- **Inverted steps** ship the spec *before* the implementation: the write-up states the contract, an executable spec fails until you satisfy it, and the answers are questions. `paso-00b` is the first (`make verify-image`). Its spec is bash rather than xUnit because it asserts properties of an *image*, and must run without a local .NET SDK. `paso-00c` is the second, and the only step where the human writes the contract *and* the spec, not just the implementation — see its write-up and [COLOPHON.md](../COLOPHON.md).

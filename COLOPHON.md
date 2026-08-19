@@ -14,6 +14,7 @@ Blanket credit for a repository is worthless, so the split is recorded step by s
 
 - **`paso-00`** is the **worked reference example**: the AI wrote the implementation so there would be one solved step to read for shape and conventions.
 - **`paso-00b` onward are inverted.** The AI writes the write-up, the contract, and an executable spec that fails; the *implementation is the human's*, typed by hand. The AI reviews and answers with questions, and does not supply the fix. Where a step is inverted, its write-up says so.
+- **`paso-00c` is the outlier.** Both hats are the human's: the AI writes only the exercise's rules (this write-up), never the interface or the acceptance tests it describes — those are what the human produces wearing the *client* hat, then implements wearing the *engineer* hat. Every other inverted step has the AI supply the contract; this is the one step that trains producing it.
 
 The honest sentence about this repo is therefore "I designed and directed it, and from `paso-00b` I implement it by hand against specs I asked for" — not "I hand-built a .NET backend."
 
