@@ -14,26 +14,39 @@ The domain is a double-entry ledger / wallet — the classic backend rite of pas
 
 ## Roadmap
 
-| step | Focus | Teaches |
-|------|-------|---------|
-| **00** | The database, by hand (no ORM) | psql, raw parameterized SQL, hand-written migrations, schema design |
-| **00b** | The image, by hand | multi-stage builds, layer cache, non-root containers, compose wiring |
-| 01 | Money, correctly | `numeric` vs `float`, constraints, the double-entry invariant |
-| 02 ⭐ | Transactions, isolation & the double-spend race | `SELECT FOR UPDATE`, isolation levels, concurrency tests |
-| 03 | Idempotency & uniqueness | idempotency keys, unique constraints, safe retries |
-| 04 | Indexes & query plans | `EXPLAIN ANALYZE`, index scans, connection pooling |
-| 05 | Now the ORM (EF Core) | mapping the same ops, seeing the SQL it generates |
-| 06 | Events & the transactional outbox | atomic write+publish, dual-write bugs |
-| 07 | Kafka | producers/consumers, partitions, at-least-once, DLQ |
-| 08 | Eventual consistency & read models | projections, read-model lag |
-| 09 | Observability & ops | health/readiness/liveness, metrics, graceful shutdown |
-| 10 | The interview layer | each step mapped to a mid/senior interview question |
+| step | lang | Focus | Teaches |
+|------|------|-------|---------|
+| **00** | .NET | The database, by hand (no ORM) | psql, raw parameterized SQL, hand-written migrations, schema design |
+| **00b** | .NET | The image, by hand | multi-stage builds, layer cache, non-root containers, compose wiring |
+| 00c | — | Two hats | authoring a contract someone else implements blind, then implementing one |
+| 01 | **both** | Money, correctly | `numeric` vs `float`; a decimal type where the language has one, integer minor units where it does not |
+| 02 ⭐ | Go | Transactions, isolation & the double-spend race | `SELECT FOR UPDATE`, lock ordering, `SERIALIZABLE` + `40001` retry, concurrency tests |
+| 03 | Go | Idempotency & uniqueness | idempotency keys, unique constraints, safe retries |
+| ~~04~~ | — | ~~Indexes & query plans~~ | *skipped — already demonstrated in production (trigram GIN, ~500k rows)* |
+| 04b ⚖️ | agnostic | Choosing the store | relational vs. document, argued from invariants and what you must count |
+| ~~05~~ | — | ~~The ORM~~ | *skipped — EF Core is used professionally* |
+| 06 | Go | Events & the transactional outbox | atomic write+publish, dual-write bugs |
+| 06b ⚖️ | Go | Queues as buffers | work queue vs. fan-out, visibility timeout, backpressure, DLQ |
+| 07 | Go | Kafka | producers/consumers, partitions, at-least-once, DLQ |
+| 08 | Go | Eventual consistency & read models | projections, read-model lag |
+| 09 | Go | Observability & ops | health/readiness/liveness, metrics, graceful shutdown |
+| 10 | agnostic | The interview layer | each step mapped to a mid/senior interview question |
+| 11 ⚖️ | agnostic | The compute seam | serverless vs. container vs. worker, and when *not* to go serverless |
+| 11b | agnostic | The cloud seam | one managed cloud, then the primitive-mapping table across providers |
+| 12 ⭐⚖️ | Go | The agent seam | an agent's choice, recorded idempotently and published through the outbox |
 
 Full detail in [docs/ROADMAP.md](docs/ROADMAP.md). Each step ships a `docs/paso-NN-*.md` write-up, working code, tests, and a git tag `paso-NN` — so you can `git checkout paso-02` to see exactly that state.
 
 ## Stack
 
-.NET 10 · PostgreSQL 17 · Npgsql (raw, *before* EF) · Docker Compose · xUnit. Kafka (Redpanda) arrives at paso-07.
+**PostgreSQL 17** throughout, driven with raw SQL and hand-written migrations — no ORM, no auto-migration on startup. Docker Compose for everything local. Kafka (Redpanda) arrives at paso-07.
+
+**Two language lines, and the seam is deliberate:**
+
+- **.NET 10** · Npgsql · xUnit — steps 00–01. The worked reference, then frozen.
+- **Go** · pgx · the standard `testing` package and the race detector — step 02 onward, where concurrency, queues and delivery semantics live.
+
+`paso-01` is the one step that exists on both sides, because the two languages solve the money problem differently and the difference is the lesson. The full reasoning, and the table of which step runs where, is in [`go/README.md`](go/README.md).
 
 ## Try it in 60 seconds
 

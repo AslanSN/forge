@@ -74,11 +74,18 @@ charges. Put one genuinely document-shaped entity into the ledger and write down
 criterion to land: not "rigid vs. flexible" but **which invariants do I need the store to enforce
 for me**, and **what am I going to have to count in order to bill for it**.
 
-**2. paso-02 + paso-03 — concurrency and idempotency, as one block**
+**2. paso-02 + paso-03 — concurrency and idempotency, as one block — and in Go**
 Not a detour: at-least-once delivery is the whole reason queue consumers must be idempotent, so
 these are the prerequisite for paso-06b rather than a parallel interest. Build them together and
 keep moving — `SELECT FOR UPDATE`, isolation levels, a concurrency test that genuinely fails
 before it passes, then the unique constraint + idempotency key.
+
+**The code line switches to Go here** (policy and the per-step table: [`go/README.md`](../go/README.md)).
+The fundamentals are properties of Postgres and of distributed systems, so they transfer between
+languages; the *evidence* does not — .NET is already the paid production language and Go is the
+gap that costs real interviews. The scaffolding is in: `go/` holds the module, the paso-00 reference
+ported (`Create`/`Get`, the numeric↔Go boundary), the paso-01 stubs and `race_test.go`, which is the
+executable spec for paso-02.
 
 **3. paso-06 + paso-06b ⚖️ — outbox, then queues as buffers**
 The single biggest gap. Build the **queue as a buffer** as its own step, not folded into Kafka:
@@ -179,12 +186,23 @@ the priority order would leave it. Worth knowing which one I'm actually doing.
 
 - [x] **Commit paso-00b** — done (`709549a`). The write-up and the executable spec are in.
 - [x] **Finish paso-00b** — `Dockerfile`, `.dockerignore` and the compose `api` service are in;
-      `make verify-image` is green (14/14). Only `git tag paso-00b` is left.
+      `make verify-image` is green (14/14). Tagged `paso-00b` (and `paso-00` retroactively).
 - [ ] **Start paso-00c** — two hats: the write-up is in
       ([paso-00c](paso-00c-two-hats.md)). Next in numeric order, before `01`. Nothing here is
       mine to write — pick the exercise's entity, write the contract, then implement it blind.
-- [ ] **Finish paso-01** — `MoneyRules.NormalizeAmount` is still a `NotImplementedException`; four
-      tests are red. The smallest of the three, and it puts the suite back to green.
+- [ ] **paso-01 in Go — first, because it is the critical path.** `money.NormalizeAmount`, then
+      `accounts.Deposit`/`Withdraw` the naive read-check-write way, on purpose. `make go-test` goes
+      green single-threaded. Small; it exists only so `paso-02` has something real to break.
+- [ ] **Finish paso-01 (.NET) — second, and as housekeeping rather than study.** `MoneyRules.NormalizeAmount`
+      is still a `NotImplementedException`; four tests are red. ~20 minutes, and it leaves the .NET
+      reference green rather than permanently red for anyone reading the repo. It is the same lesson in
+      another syntax — after the Go version it is typing, not learning. The one thing not to do is leave
+      it ambiguous: land it, or say in `go/README.md` that the .NET line stops mid-`paso-01`.
+- [ ] **paso-02 (Go)** — the write-up is in
+      ([paso-02](paso-02-transactions-isolation-and-the-double-spend-race.md)) and `race_test.go` is the
+      failing spec. Record the numbers the naive version produces *before* fixing anything, then climb
+      all four rungs (transaction ≠ lock → `FOR UPDATE` + lock ordering → `SERIALIZABLE` + `40001`
+      retry → guarded single-statement `UPDATE`) and write down which one you would ship and why.
 - [ ] **Start paso-04b** — the write-up is in ([paso-04b](paso-04b-choosing-the-store.md)): a decision brief, not a
       red spec. What's left is mine — migration `002`, the four probes, and the ADR at
       `docs/paso-04b-decision.md`, written *before* the reviewer sees it.

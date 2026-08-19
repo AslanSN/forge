@@ -9,8 +9,8 @@ Each step is identified as `paso-NN` — the write-up filename, and the git tag.
 | 00 | The database, by hand | string-interpolated SQL; ad-hoc DDL | parameterized queries; versioned migrations | — |
 | 00b | The image, by hand | single-stage SDK image, root user, `COPY . .` before restore | multi-stage build, non-root, cache-ordered layers, compose wiring | — |
 | 00c | Two hats | write the interface already picturing the implementation you're about to type, so the "contract" just narrates code you'd have written anyway | a real wall between the client hat (contract + acceptance tests, zero implementation) and the engineer hat (implementation against the contract alone, no more context) — the same rep paso-12 later asks of an agent | — |
-| 01 | Money | `float`/`double` balance → drift | `numeric(18,2)`, CHECKs, Σ(entries)=0 | #06 |
-| 02 | Concurrency | read-balance-then-write → double-spend | transaction + `SELECT FOR UPDATE`; isolation levels | — |
+| 01 · both | Money | `float`/`double` balance → drift | `numeric(18,2)`, CHECKs, Σ(entries)=0 — and the two standard escapes from float: a **decimal** type where the language has one (C#), **integer minor units** where it does not (Go has no decimal at all) | #06 |
+| 02 · Go | Concurrency | read-balance-then-write → double-spend; "a transaction will fix it" | the four rungs: transaction ≠ lock → `FOR UPDATE` + lock ordering → `SERIALIZABLE` + `40001` retry → the guarded single-statement `UPDATE`; then the balance stops being a column | — |
 | 03 | Idempotency | check-then-insert race → duplicate rows | unique constraint + idempotency key → idempotent 409 | #14 |
 | 04 | Indexing | sequential scan on a hot query | `EXPLAIN ANALYZE` → the right index; connection pooling | #15 |
 | 04b ⚖️ | Choosing the store | force every shape into the relational model (or flee to a document store wholesale) | where relational saves you vs. taxes you; what a document store buys and charges; one genuinely document-shaped entity, and the write-up of why | — |
@@ -24,6 +24,15 @@ Each step is identified as `paso-NN` — the write-up filename, and the git tag.
 | 11 ⚖️ | The compute seam | run the heavy, CPU-bound job inside a serverless function and hit the hard timeout | serverless function vs. container vs. always-on worker: cold starts, execution ceilings, memory, concurrency per instance — and the criterion for *when not* to go serverless | — |
 | 11b | The cloud seam | "it runs on my machine with Compose"; learn one provider's console instead of the primitives | stand the seam up on **one** managed cloud, then write the primitive-mapping table across GCP / AWS / Azure — managed identity instead of secrets, connection limits against a pooled database, and what the cloud silently changes about steps 02–07 | — |
 | 12 ⭐⚖️ | The agent seam | let the agent call the service directly and hope | an agent chooses the route, but the choice is recorded idempotently, published through the outbox, and a downstream failure cannot corrupt state — *architecture for AI systems* | — |
+
+## The language line
+
+**Steps 00–01 are .NET; from paso-02 the code is Go.** The reasoning, and the table of which step
+runs in which language, is in [`go/README.md`](../go/README.md). In one line: the fundamentals here
+are properties of Postgres and of distributed systems, so they transfer between languages, while the
+*evidence* does not — .NET is already the paid production language, Go is the gap. The .NET projects
+stay frozen at paso-01 as the worked reference for paso-00/00b, and `paso-01` is re-done in Go, small,
+as the precondition of paso-02: the naive read-check-write has to exist before it can be broken.
 
 **A note on paso-00c:** every gap below comes from the systems-architecture interview in
 [PLAN.md](PLAN.md) — a fixed list, one question per row. `paso-00c` doesn't answer one of those
