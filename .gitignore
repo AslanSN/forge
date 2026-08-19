@@ -17,3 +17,6 @@ TestResults/
 
 # Personal cheat-sheets
 docs/*cheatsheet*
+
+# Personal working order — spans forge and recall, not for readers of this repo
+README.local.md
