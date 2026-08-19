@@ -18,7 +18,7 @@ The domain is a double-entry ledger / wallet — the classic backend rite of pas
 |------|------|-------|---------|
 | **00** | .NET | The database, by hand (no ORM) | psql, raw parameterized SQL, hand-written migrations, schema design |
 | **00b** | .NET | The image, by hand | multi-stage builds, layer cache, non-root containers, compose wiring |
-| 00c | — | Two hats | authoring a contract someone else implements blind, then implementing one |
+| 00c | *your call* | Two hats | authoring a contract someone else implements blind, then implementing one — the contract is written language-free first, and picking the language is part of the exercise |
 | 01 | **both** | Money, correctly | `numeric` vs `float`; a decimal type where the language has one, integer minor units where it does not |
 | 02 ⭐ | Go | Transactions, isolation & the double-spend race | `SELECT FOR UPDATE`, lock ordering, `SERIALIZABLE` + `40001` retry, concurrency tests |
 | 03 | Go | Idempotency & uniqueness | idempotency keys, unique constraints, safe retries |

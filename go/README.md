@@ -16,7 +16,9 @@ Nothing is dropped by doing this. .NET keeps its place on the CV where it is str
 
 | Steps | Language | Why |
 |---|---|---|
-| 00, 00b, 01 | .NET (done / frozen) | the worked reference: schema by hand, image by hand, money rules |
+| 00, 00b | .NET (done / frozen) | the worked reference: schema by hand, image by hand |
+| 01 | **both** | the seam. The two languages escape `float` differently — `decimal` where the runtime has one, integer minor units where it does not — and that difference is the lesson |
+| 00c | **decided as part of the step** | the contract is written language-free, then landed in one; choosing which is the exercise, not an oversight. See the write-up |
 | **02, 03, 06, 06b, 07, 08, 09** | **Go** | the code steps — concurrency, idempotency, outbox, queues, Kafka, read models, ops. The language earns its keep here |
 | 04b, 10, 11, 11b | language-agnostic | criterion and prose; no implementation to write |
 | 04 | skipped | index/`EXPLAIN` work is already demonstrated in production (trigram GIN, ~500k rows, seq scan → ~3 ms) |
@@ -24,6 +26,8 @@ Nothing is dropped by doing this. .NET keeps its place on the CV where it is str
 | 12 | Go | the agent seam sits on top of the outbox and queue built in Go |
 
 `paso-01` gets re-done in Go as the *precondition* of paso-02 — the naive read-check-write has to exist before it can be broken. It is deliberately small.
+
+Because it runs on both lines back to back, `paso-01` doubles as a controlled experiment: same task, same scope, two languages. Time each side and sort what you look up into *lexical* (a method name — heals on its own) and *design* (how to model an error here — the real gap). **Documentation yes, model no**, or the reading means nothing. That result is what decides `paso-00c`'s language.
 
 ## Layout
 
