@@ -107,11 +107,64 @@ func scanAccount(row pgx.Row) (Account, error) {
 // Leaving the bug in deliberately is the method (see AGENTS.md).
 
 func (s *Store) Deposit(ctx context.Context, id string, amount money.Minor) (Account, error) {
-	panic("paso-01: implement Deposit (delete this panic)")
+	if amount <= 0 {
+		return Account{}, money.ErrBadAmount
+	}
+
+	acc, err := s.Get(ctx, id)
+	if err != nil {
+		return Account{}, err
+	}
+
+	acc.Balance = acc.Balance + amount
+
+	q := `
+	    UPDATE accounts
+		SET balance = $1::numeric
+		WHERE id = $2::uuid
+		RETURNING id::text, name, balance::text;
+	`
+
+	updAcc, err := scanAccount(s.pool.QueryRow(ctx, q, acc.Balance.String(), id))
+
+	if err != nil {
+		return Account{}, err
+	}
+
+	return updAcc, err
+
 }
 
 func (s *Store) Withdraw(ctx context.Context, id string, amount money.Minor) (Account, error) {
-	panic("paso-01: implement Withdraw the naive way — read, check in Go, write back")
+	if amount <= 0 {
+		return Account{}, money.ErrBadAmount
+	}
+
+	acc, err := s.Get(ctx, id)
+	if err != nil {
+		return Account{}, err
+	}
+
+	if amount > acc.Balance {
+		return Account{}, ErrInsufficientFunds
+	}
+
+	acc.Balance = acc.Balance - amount
+
+	q := `
+	    UPDATE accounts
+		SET balance = $1::numeric
+		WHERE id = $2::uuid
+		RETURNING id::text, name, balance::text
+	`
+
+	updAcc, err := scanAccount(s.pool.QueryRow(ctx, q, acc.Balance.String(), id))
+
+	if err != nil {
+		return Account{}, err
+	}
+
+	return updAcc, err
 }
 
 // ── paso-02 · YOUR TURN · the double-spend race ──────────────────────────────

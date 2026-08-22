@@ -111,5 +111,12 @@ func ParseMinor(s string) (Minor, error) {
 // Return a non-nil error describing the problem; never return a partially
 // valid amount alongside an error.
 func NormalizeAmount(raw string) (Minor, error) {
-	panic("paso-01: implement money.NormalizeAmount (delete this panic)")
+	minor, err := ParseMinor(raw)
+	if err != nil {
+		return 0, err
+	}
+	if minor <= 0 {
+		return 0, ErrBadAmount
+	}
+	return minor, nil
 }
