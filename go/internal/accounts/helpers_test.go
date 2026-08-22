@@ -3,6 +3,7 @@ package accounts_test
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,6 +12,17 @@ import (
 	"github.com/AslanSN/forge/go/internal/db"
 	"github.com/AslanSN/forge/go/internal/money"
 )
+
+// currentPaso is the step being worked on right now. It is the one line to bump
+// when you move on, and it decides how an unimplemented stub reports:
+//
+//	stub from currentPaso   → FAIL. That is the exercise; the step starts red.
+//	stub from a later step  → skip, so finishing this step still gets you green.
+const currentPaso = "paso-01"
+
+// nonexistentID is a well-formed UUID that no row has. Probing against it
+// reaches the code under test without matching anything.
+const nonexistentID = "00000000-0000-0000-0000-000000000000"
 
 // seedAccount inserts a funded account with raw SQL on purpose: a test fixture
 // must not depend on the code under test, or a broken Deposit hides a broken
@@ -41,22 +53,41 @@ func balanceOf(t *testing.T, store *accounts.Store, id string) money.Minor {
 	return acc.Balance
 }
 
-// skipUntilImplemented turns the "panic: paso-NN: implement …" stubs into a
-// readable skip, so a red run tells you which step to do next instead of
-// crashing the test binary from inside a goroutine.
-func skipUntilImplemented(t *testing.T, probe func()) {
+// stubPanic matches the "paso-NN: implement …" message the stubs panic with,
+// capturing the step it belongs to.
+var stubPanic = regexp.MustCompile(`^(paso-[0-9]{2}[a-z]?): `)
+
+// requireImplemented runs probe to find out whether the stub it calls is still
+// a panic, and reports accordingly (see currentPaso).
+//
+// The probe MUST be side-effect free — call it against nonexistentID, never
+// against the account the test is about to measure. An earlier version probed
+// with a real one-cent operation on the seeded account, and the moment the
+// stubs were implemented every balance assertion in the suite came out a cent
+// off, including race_test.go's, which then blamed the drift on a lost update.
+// A test fixture that moves money cannot be used to test money.
+func requireImplemented(t *testing.T, probe func()) {
 	t.Helper()
 	done := make(chan any, 1)
 	go func() {
 		defer func() { done <- recover() }()
 		probe()
 	}()
-	if r := <-done; r != nil {
-		if msg, ok := r.(string); ok {
-			t.Skipf("not implemented yet → %s", msg)
-		}
-		t.Skipf("not implemented yet → %v", r)
+
+	r := <-done
+	if r == nil {
+		return // implemented — carry on
 	}
+	msg := fmt.Sprint(r)
+	step := stubPanic.FindStringSubmatch(msg)
+	if step == nil {
+		// Not a stub: something under test genuinely blew up. Never swallow it.
+		t.Fatalf("probe panicked: %v", r)
+	}
+	if step[1] == currentPaso {
+		t.Fatalf("not implemented yet → %s", msg)
+	}
+	t.Skipf("waiting on %s → %s", step[1], msg)
 }
 
 func newStore(t *testing.T) (*accounts.Store, *pgxpool.Pool) {

@@ -27,7 +27,7 @@ func TestConcurrentWithdrawals_NeverDoubleSpend(t *testing.T) {
 	store, pool := newStore(t)
 	ctx := context.Background()
 	id := seedAccount(t, pool, 10000) // 100.00
-	skipUntilImplemented(t, func() { _, _ = store.Withdraw(ctx, id, 1) })
+	requireImplemented(t, func() { _, _ = store.Withdraw(ctx, nonexistentID, 1) })
 
 	const goroutines = 20
 	var (
@@ -64,7 +64,7 @@ func TestConcurrentDeposits_LoseNoUpdates(t *testing.T) {
 	store, pool := newStore(t)
 	ctx := context.Background()
 	id := seedAccount(t, pool, 0)
-	skipUntilImplemented(t, func() { _, _ = store.Deposit(ctx, id, 1) })
+	requireImplemented(t, func() { _, _ = store.Deposit(ctx, nonexistentID, 1) })
 
 	const (
 		goroutines = 50
@@ -98,7 +98,7 @@ func TestConcurrentTransfers_ConserveTotal(t *testing.T) {
 	ctx := context.Background()
 	a := seedAccount(t, pool, 10000) // 100.00
 	b := seedAccount(t, pool, 10000) // 100.00
-	skipUntilImplemented(t, func() { _ = store.Transfer(ctx, a, b, 1) })
+	requireImplemented(t, func() { _ = store.Transfer(ctx, nonexistentID, nonexistentID, 1) })
 
 	const rounds = 25
 	var wg sync.WaitGroup
@@ -133,7 +133,7 @@ func TestTransferIsAtomic(t *testing.T) {
 	ctx := context.Background()
 	a := seedAccount(t, pool, 1000)  // 10.00
 	b := seedAccount(t, pool, 10000) // 100.00
-	skipUntilImplemented(t, func() { _ = store.Transfer(ctx, a, b, 1) })
+	requireImplemented(t, func() { _ = store.Transfer(ctx, nonexistentID, nonexistentID, 1) })
 
 	if err := store.Transfer(ctx, a, b, 5000); err == nil { // 50.00 out of 10.00
 		t.Fatal("transferring more than the source holds must fail")

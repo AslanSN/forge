@@ -41,7 +41,7 @@ func TestCreateAndGet(t *testing.T) {
 	if got.ID != acc.ID || got.Name != "reference account" || got.Balance != 0 {
 		t.Errorf("round-trip mismatch: %+v", got)
 	}
-	if _, err := store.Get(ctx, "00000000-0000-0000-0000-000000000000"); !errors.Is(err, accounts.ErrNotFound) {
+	if _, err := store.Get(ctx, nonexistentID); !errors.Is(err, accounts.ErrNotFound) {
 		t.Errorf("missing account should be ErrNotFound, got %v", err)
 	}
 }
@@ -52,7 +52,7 @@ func TestDepositAddsExactly(t *testing.T) {
 	store, pool := newStore(t)
 	ctx := context.Background()
 	id := seedAccount(t, pool, 0)
-	skipUntilImplemented(t, func() { _, _ = store.Deposit(ctx, id, 1) })
+	requireImplemented(t, func() { _, _ = store.Deposit(ctx, nonexistentID, 1) })
 
 	for range 3 {
 		if _, err := store.Deposit(ctx, id, 1050); err != nil { // 10.50
@@ -68,7 +68,7 @@ func TestWithdrawRefusesToOverdraw(t *testing.T) {
 	store, pool := newStore(t)
 	ctx := context.Background()
 	id := seedAccount(t, pool, 10000) // 100.00
-	skipUntilImplemented(t, func() { _, _ = store.Withdraw(ctx, id, 1) })
+	requireImplemented(t, func() { _, _ = store.Withdraw(ctx, nonexistentID, 1) })
 
 	if _, err := store.Withdraw(ctx, id, 10001); !errors.Is(err, accounts.ErrInsufficientFunds) {
 		t.Errorf("overdraw should be ErrInsufficientFunds, got %v", err)
@@ -88,7 +88,7 @@ func TestAmountsAreValidated(t *testing.T) {
 	store, pool := newStore(t)
 	ctx := context.Background()
 	id := seedAccount(t, pool, 10000)
-	skipUntilImplemented(t, func() { _, _ = store.Deposit(ctx, id, 1) })
+	requireImplemented(t, func() { _, _ = store.Deposit(ctx, nonexistentID, 1) })
 
 	for _, bad := range []money.Minor{0, -1} {
 		if _, err := store.Deposit(ctx, id, bad); err == nil {
