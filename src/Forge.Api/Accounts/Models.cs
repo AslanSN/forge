@@ -30,10 +30,20 @@ public static class AccountRules
 /// </summary>
 public static class MoneyRules
 {
+    public const int MaxDecimalScale = 2;
     /// <summary>
     /// Validate a monetary amount. Return the amount, or an error message.
-    /// Rules: must be &gt; 0, and at most 2 decimal places.
+    /// Rules: must be > 0, and at most 2 decimal places.
     /// </summary>
-    public static (decimal Amount, string? Error) NormalizeAmount(decimal raw) =>
-        throw new NotImplementedException("paso-01: implement MoneyRules.NormalizeAmount (delete this throw).");
+    public static (decimal Amount, string? Error) NormalizeAmount(decimal raw)
+    {
+        if (raw <= 0)
+            return (raw, "value must be positive");
+
+        if (raw.Scale > MaxDecimalScale)
+            return (raw, $"value cannot have more than {MaxDecimalScale} decimals");
+
+        return (raw, null);
+    }
+
 }
